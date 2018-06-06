@@ -1,0 +1,10 @@
+dependencies:
+  - pip=9.0.1
+  - python=3.6
+  - pip:
+    - grpcio>=1.0
+    - pandas>=0.22.0
+    - scipy>=1.0.0
+    - scikit-learn>=0.19.1
+    - tensorflow==1.7.0
+    - pipeline-runtime==1.0.8
