@@ -1,0 +1,5 @@
+# Ignore folder named 'output'
+output/
+
+# Ignore folder named 'pipeline_tfserving'
+pipeline_tfserving/
