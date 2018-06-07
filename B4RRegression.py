@@ -5,7 +5,6 @@ Created on Mon Jul 17 09:27:10 2017
 @author: H128815 <yogendra.pandey@halliburton.com>
 BRAINS4Reservoirs - Petrophysical Properties Regression.
 """
-# Import the required modules.
 import numpy as np
 import pandas as pd
 

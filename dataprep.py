@@ -13,22 +13,16 @@ class DataPrep():
         
         
         # running with the pipelineAI CLI
-        #data_dir = "/Users/arnab/devwork/lgcwork/basicDNN/input/"
         self.inputFile = "/input_train.csv"
         self.inputPath = data_dir + self.inputFile
         print ("*** input file path is :: " + self.inputPath)
 
         """
-        # running without the pipeline CLI
+        # running without the pipelineAI CLI
         #data_dir = "/Users/arnab/devwork/lgcwork/basicDNN/model/
         self.data_dir = os.path.dirname(data_dir)
-        self.inputFile = "/input/input.csv"
+        self.inputFile = "/input/input_train.csv"
         self.inputPath = self.data_dir + self.inputFile
-        """
-        
-        """
-        # running just the data prep part
-        self.inputPath = "/Users/arnab/devwork/lgcwork/basicDNN/input/wellData.csv"
         """
 
         self.xColName = xColName
@@ -114,12 +108,9 @@ class DataPrep():
         #self.X, self.xHoldOut, self.y, self.yHoldOut = train_test_split(self.X, self.y, test_size=self.validFrac, random_state=self.seed)
         self.xTrain, self.xValid, self.yTrain, self.yValid = train_test_split(self.X, self.y, test_size=self.validFrac, random_state=self.seed)
 
-        # print the types
-        print (type(self.xTrain), type(self.xValid))
-        print (type(self.yTrain), type(self.yValid))
+        # print some assessment information
         print ("Shape of xTrain = " + str(self.xTrain.shape))
         print ("Shape of xValid = " + str(self.xValid.shape))
-        #print ("Shape of xholdHout = " + str(self.xHoldOut.shape))
 
     # create a TF Dataset from the training data
     def train(self):
@@ -129,21 +120,15 @@ class DataPrep():
     def validate(self):
         return tf.data.Dataset.from_tensor_slices((self.xValid, self.yValid))
 
-    """
-    def predict(self):
-        return tf.data.Dataset.from_tensor_slices(self.xHoldOut)
-    """
-
     # create a TF Dataset from the pointcloud data for prediction step
     def predict(self):
         return tf.data.Dataset.from_tensor_slices(self.pointCloudFeatures)
 
+    # pre-process the pointcloud data to calculate features
     def processPointCloudData(self, pointCloudPath):
         self.pointCloudFeatures, nanIdxs = self.b4rReg.formulatePointCloudInput(pointCloudPath)
         self.pointCloudFeatures = self.b4rReg.scaleData(self.pointCloudFeatures)
-        print (self.pointCloudFeatures[:3])
         return nanIdxs
-
 
 if __name__ == '__main__':
     dp = DataPrep()

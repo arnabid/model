@@ -67,8 +67,7 @@ def _transform_request(request: bytes) -> dict:
     #
     request_str = request.decode('utf-8')
     request_json = json.loads(request_str)
-    request_np = np.array(request_json['input'], dtype=np.float32)
-    request_np = request_np.reshape(-1,54)
+    request_np = np.array(request_json['input'], dtype=np.float32).reshape(-1,54)
     transformed_request_dict = {}
     transformed_request_dict['inputs'] = tf.make_tensor_proto(request_np, dtype=tf.float32)
     return transformed_request_dict
