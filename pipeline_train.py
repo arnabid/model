@@ -152,10 +152,11 @@ def main(unused_argv):
         ds = dp.train()
         ds = ds.cache().batch(FLAGS.batch_size).repeat(FLAGS.train_epochs)
         ds = ds.shuffle(buffer_size=50000)
+        return ds
         
         # Return the next batch of data.
-        features, labels = ds.make_one_shot_iterator().get_next()
-        return features, labels
+        #features, labels = ds.make_one_shot_iterator().get_next()
+        #return features, labels
 
     # Set up training hook that logs the training MSE every 100 steps.
     tensors_to_log = {'train_MSE': 'train_MSE'}
@@ -189,11 +190,9 @@ def main(unused_argv):
     def predict_input_fn():
         return dp.predict().batch(FLAGS.batch_size).make_one_shot_iterator().get_next(), None
     
-    predictions = petroDDN_predictor.predict(input_fn=predict_input_fn)
-    values = np.array(list(map(lambda item: item["predictions"][0],list(itertools.islice(predictions, 0, None)))))
-    #values = values * (dp.b4rReg.propMax - dp.b4rReg.propMin) + dp.b4rReg.propMin
+    predictions = list(petroDDN_predictor.predict(input_fn=predict_input_fn))
+    values = np.array([item['predictions'][0] for item in predictions])
     values[nanIdxs] = dp.propNDV
-    #print('\n\nPrediction results:\n\t%s' % values)
 
     # write the computed pointcloud features to an intermediate file
     op_in = pd.DataFrame(data=dp.pointCloudFeatures)
@@ -241,8 +240,8 @@ class PetroDNNArgParser(argparse.ArgumentParser):
             '--intermediate_pointcloud_file',
             type=str,
             #default='/Users/arnab/devwork/lgcwork/basicDNN/input/int_pcfile.csv',
-            default='%s/int_pcfile.csv' % os.environ['PIPELINE_INPUT_PATH'],
-            help='Path of the intermediate file to write the point cloud features')
+            default='%s/features_pcfile.csv' % os.environ['PIPELINE_INPUT_PATH'],
+            help='Path of the intermediate file to write the computed point cloud features')
         self.add_argument(
             '--model_dir',
             type=str,

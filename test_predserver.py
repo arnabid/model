@@ -5,7 +5,7 @@ import pandas as pd
 
 if __name__ == '__main__':
 	# intermediate file with the computed features from the pointcloud file 
-	features_pcfile = "/Users/arnab/devwork/lgcwork/basicDNN/input/int_pcfile.csv"
+	features_pcfile = "/Users/arnab/devwork/lgcwork/basicDNN/input/features_pcfile.csv"
 	df = pd.read_csv(features_pcfile)
 
 	# convert the dataframe to string
