@@ -145,7 +145,6 @@ def main(unused_argv):
             'batch_size': FLAGS.batch_size
         },
     )
-    #    config=run_config)
 
     # Train the model
     def train_input_fn():
@@ -188,7 +187,7 @@ def main(unused_argv):
     nanIdxs = dp.processPointCloudData(FLAGS.input_pointcloud_file)
 
     def predict_input_fn():
-        return dp.predict().batch(FLAGS.batch_size).make_one_shot_iterator().get_next(), None
+        return dp.predict().batch(FLAGS.batch_size)
     
     predictions = list(petroDDN_predictor.predict(input_fn=predict_input_fn))
     values = np.array([item['predictions'][0] for item in predictions])
