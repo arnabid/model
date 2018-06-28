@@ -125,9 +125,6 @@ def main(unused_argv):
                        if tf.test.is_built_with_cuda() else 'channels_last')
     """
 
-    # run_config=tf.estimator.RunConfig(model_dir=os.path.join(os.environ['PIPELINE_OUTPUT_PATH'],
-    #                                                            'pipeline_tfserving/0')),
-
     # define a DataPrep object
     dp = DataPrep(FLAGS.data_dir, FLAGS.xColName, FLAGS.yColName, FLAGS.zColName,
                     FLAGS.propColName, FLAGS.wellColName, FLAGS.sill,
@@ -170,8 +167,7 @@ def main(unused_argv):
         return dp.validate().batch(FLAGS.batch_size).make_one_shot_iterator().get_next()
 
     eval_results = petroDDN_predictor.evaluate(input_fn=eval_input_fn)
-    print()
-    print('Evaluation results:\n\t%s' % eval_results)
+    print('\n\nEvaluation results:\n\t%s' % eval_results)
 
     # Export the model
     if FLAGS.export_dir is not None:
