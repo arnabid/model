@@ -165,8 +165,8 @@ class BasicDNNArgParser(argparse.ArgumentParser):
             '--intermediate_pointcloud_file',
             type=str,
             #default='/Users/arnab/devwork/lgcwork/basicDNN/input/int_pcfile.csv',
-            default='%s/int_pcfile.csv' % os.environ['PIPELINE_INPUT_PATH'],
-            help='Path of the intermediate file to write the point cloud features')
+            default='%s/features_pcfile.csv' % os.environ['PIPELINE_INPUT_PATH'],
+            help='Path of the intermediate file to write the computed point cloud features')
         self.add_argument(
             '--model_dir',
             type=str,

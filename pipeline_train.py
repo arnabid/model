@@ -125,9 +125,6 @@ def main(unused_argv):
                        if tf.test.is_built_with_cuda() else 'channels_last')
     """
 
-    # run_config=tf.estimator.RunConfig(model_dir=os.path.join(os.environ['PIPELINE_OUTPUT_PATH'],
-    #                                                            'pipeline_tfserving/0')),
-
     # define a DataPrep object
     dp = DataPrep(FLAGS.data_dir, FLAGS.xColName, FLAGS.yColName, FLAGS.zColName,
                     FLAGS.propColName, FLAGS.wellColName, FLAGS.sill,
@@ -145,17 +142,17 @@ def main(unused_argv):
             'batch_size': FLAGS.batch_size
         },
     )
-    #    config=run_config)
 
     # Train the model
     def train_input_fn():
         ds = dp.train()
         ds = ds.cache().batch(FLAGS.batch_size).repeat(FLAGS.train_epochs)
         ds = ds.shuffle(buffer_size=50000)
+        return ds
         
         # Return the next batch of data.
-        features, labels = ds.make_one_shot_iterator().get_next()
-        return features, labels
+        #features, labels = ds.make_one_shot_iterator().get_next()
+        #return features, labels
 
     # Set up training hook that logs the training MSE every 100 steps.
     tensors_to_log = {'train_MSE': 'train_MSE'}
@@ -170,8 +167,7 @@ def main(unused_argv):
         return dp.validate().batch(FLAGS.batch_size).make_one_shot_iterator().get_next()
 
     eval_results = petroDDN_predictor.evaluate(input_fn=eval_input_fn)
-    print()
-    print('Evaluation results:\n\t%s' % eval_results)
+    print('\n\nEvaluation results:\n\t%s' % eval_results)
 
     # Export the model
     if FLAGS.export_dir is not None:
@@ -187,13 +183,11 @@ def main(unused_argv):
     nanIdxs = dp.processPointCloudData(FLAGS.input_pointcloud_file)
 
     def predict_input_fn():
-        return dp.predict().batch(FLAGS.batch_size).make_one_shot_iterator().get_next(), None
+        return dp.predict().batch(FLAGS.batch_size)
     
-    predictions = petroDDN_predictor.predict(input_fn=predict_input_fn)
-    values = np.array(list(map(lambda item: item["predictions"][0],list(itertools.islice(predictions, 0, None)))))
-    #values = values * (dp.b4rReg.propMax - dp.b4rReg.propMin) + dp.b4rReg.propMin
+    predictions = list(petroDDN_predictor.predict(input_fn=predict_input_fn))
+    values = np.array([item['predictions'][0] for item in predictions])
     values[nanIdxs] = dp.propNDV
-    #print('\n\nPrediction results:\n\t%s' % values)
 
     # write the computed pointcloud features to an intermediate file
     op_in = pd.DataFrame(data=dp.pointCloudFeatures)
@@ -241,8 +235,8 @@ class PetroDNNArgParser(argparse.ArgumentParser):
             '--intermediate_pointcloud_file',
             type=str,
             #default='/Users/arnab/devwork/lgcwork/basicDNN/input/int_pcfile.csv',
-            default='%s/int_pcfile.csv' % os.environ['PIPELINE_INPUT_PATH'],
-            help='Path of the intermediate file to write the point cloud features')
+            default='%s/features_pcfile.csv' % os.environ['PIPELINE_INPUT_PATH'],
+            help='Path of the intermediate file to write the computed point cloud features')
         self.add_argument(
             '--model_dir',
             type=str,
